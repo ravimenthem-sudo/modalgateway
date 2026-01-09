@@ -1,0 +1,18 @@
+# SLM Backend Dependencies
+# Fine-tuned Llama 3.1 via Together API
+
+# Server
+fastapi>=0.100.0
+uvicorn>=0.23.0
+nest-asyncio>=1.5.8
+pyngrok>=5.0.0
+
+# AI
+together>=0.2.0
+
+# Database
+requests>=2.31.0
+
+# Utils
+python-dotenv>=1.0.0
+pydantic>=2.0.0
