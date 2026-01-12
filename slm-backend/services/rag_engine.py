@@ -61,6 +61,10 @@ class RAGEngine:
         # 3. Retrieve relevant chunks
         retrieved = self._retrieve_chunks(query, role, tagged_doc_id, top_k)
         
+        # Debug: Log retrieved chunks
+        if retrieved["chunks"]:
+             logger.info(f"Retrieved {len(retrieved['chunks'])} chunks for query: '{query}'")
+        
         if not retrieved["chunks"]:
             logger.info("No relevant chunks found")
             return self._out_of_scope_response(
@@ -125,12 +129,42 @@ class RAGEngine:
         if tagged_doc_id:
             metadata_filter["document_id"] = tagged_doc_id
         
-        # Query vector DB
+        # Query vector DB (Primary)
         results = self.vector_db.query(
             query_embeddings=query_embedding,
             where=metadata_filter,
             n_results=top_k
         )
+        
+        # Intelligent Query Refinement using LLM
+        # This extracts core topics (e.g. "Education" from "Education in Document(Testing)")
+        refined_query = self.llm_gateway.refine_query_with_llm(query, openai_client=self.openai_client)
+        
+        # Only perform augmented search if the query was actually refined/changed
+        if refined_query and refined_query.lower() != query.lower():
+            augmented_query = refined_query
+            logger.info(f"Augmenting search with refined query: '{query}' -> '{augmented_query}'")
+            
+            # Use the SAME filter as original query (do not remove document_id)
+            # This ensures we don't retrieve chunks from other documents
+            aug_filter = metadata_filter
+                
+            aug_embedding = self.embedding_service.embed_query(augmented_query)
+            aug_results = self.vector_db.query(
+                query_embeddings=aug_embedding,
+                where=aug_filter,
+                n_results=top_k
+            )
+            
+            # Merge results (simple append, duplicates handled later or ignored)
+            if aug_results['documents'] and aug_results['documents'][0]:
+                if results['documents'] and results['documents'][0]:
+                    results['documents'][0].extend(aug_results['documents'][0])
+                    results['ids'][0].extend(aug_results['ids'][0])
+                    results['metadatas'][0].extend(aug_results['metadatas'][0])
+                    results['similarities'].extend(aug_results['similarities'])
+                else:
+                    results = aug_results
         
         # Format results
         chunks = []
@@ -166,8 +200,9 @@ class RAGEngine:
         if not similarities or not chunks:
             return 0.0
         
-        # Average similarity
-        avg_similarity = np.mean(similarities)
+        # Average similarity - ensure all values are floats
+        similarities_float = [float(s) if s is not None else 0.0 for s in similarities]
+        avg_similarity = np.mean(similarities_float) if similarities_float else 0.0
         
         # Coverage (more chunks = better coverage)
         coverage = min(len(chunks) / 5.0, 1.0)  # Normalize to 1

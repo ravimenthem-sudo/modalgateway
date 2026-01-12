@@ -1,0 +1,89 @@
+╭──────────────────────────── 🚀 New SDK Available ────────────────────────────╮
+│ Together Python SDK 2.0 is now available!                                    │
+│                                                                              │
+│ Install the beta:                                                            │
+│ pip install --pre together  or  uv add together --prerelease allow           │
+│                                                                              │
+│ New SDK: https://github.com/togethercomputer/together-py                     │
+│ Migration guide: https://docs.together.ai/docs/pythonv2-migration-guide      │
+│                                                                              │
+│ This package will be maintained until January 2026.                          │
+│ Set TOGETHER_NO_BANNER=1 to hide this message.                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+INFO:     Started server process [49002]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+LLM System Prompt Loaded (5737 chars)
+
+============================================================
+UNIFIED MODAL GATEWAY
+============================================================
+SLM Backend: OK
+RAG Engine: OK
+LLM Backend (OpenAI): OK
+Task Monitor: OK
+
+Listening on: http://0.0.0.0:8000
+============================================================
+
+Starting SLM Backend (Unified Gateway)...
+Initializing RAG Engine & Vector DB...
+RAG Engine Ready!
+Starting Task Lifecycle Monitor...
+[MONITOR] Starting Task Monitor Scheduler
+   Interval: Every 2 hours
+   Press Ctrl+C to stop
+
+
+============================================================
+Task Monitoring Cycle - 2026-01-12 14:40:00
+============================================================
+Error fetching tasks: 'SimpleSupabaseQuery' object has no attribute 'not_'
+[MONITOR] Fetched 0 active tasks
+[MONITOR] No active tasks to monitor
+
+[MONITOR] Sleeping until 2026-01-12 16:40:00
+============================================================
+
+✓ Task Monitor started in background (checks every 2 hours)
+
+============================================================
+Unified Query: Education in Document(Testing)
+Role: employee | User: guest
+============================================================
+[RAG] Trying RAG Engine...
+RAG Response: Confidence=0.6044756039460668, Out of Scope=False
+[RAG+LLM] Enhanced answer generated (869 tokens)
+INFO:     127.0.0.1:59560 - "POST /api/chatbot/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59609 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59609 - "OPTIONS /api/chatbot/query HTTP/1.1" 200 OK
+
+============================================================
+Unified Query: Education in Document(Testing)
+Role: employee | User: 92abac2d-04ba-4deb-a71f-844591e7c0fd
+============================================================
+[RAG] Trying RAG Engine...
+RAG Response: Confidence=0.604480296366805, Out of Scope=False
+[RAG+LLM] Enhanced answer generated (1054 tokens)
+INFO:     127.0.0.1:59609 - "POST /api/chatbot/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59611 - "GET /health HTTP/1.1" 200 OK
+
+============================================================
+Unified Query: 5.7 support panel in SLM Test Doc
+Role: employee | User: 92abac2d-04ba-4deb-a71f-844591e7c0fd
+============================================================
+[RAG] Trying RAG Engine...
+RAG Response: Confidence=0.6247695940109614, Out of Scope=False
+[RAG+LLM] Enhanced answer generated (1174 tokens)
+INFO:     127.0.0.1:59611 - "POST /api/chatbot/query HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59670 - "GET /health HTTP/1.1" 200 OK
+
+============================================================
+Unified Query: 3.4 in SLM Test Doc
+Role: employee | User: 92abac2d-04ba-4deb-a71f-844591e7c0fd
+============================================================
+[RAG] Trying RAG Engine...
+RAG Response: Confidence=0.6053285087189866, Out of Scope=False
+[RAG+LLM] Enhanced answer generated (1467 tokens)
+INFO:     127.0.0.1:59670 - "POST /api/chatbot/query HTTP/1.1" 200 OK

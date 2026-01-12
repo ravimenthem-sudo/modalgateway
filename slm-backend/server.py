@@ -4,6 +4,9 @@ import nest_asyncio
 import json
 import re
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -45,7 +48,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
-PORT = 8035 
+PORT = 8000 
 
 # ----------------- STARTUP -----------------
 @asynccontextmanager
@@ -1899,7 +1902,8 @@ async def unified_chat_query(req: FrontendChatRequest):
             query=query_text,
             role=user_role_enum,
             page_module=context.get("route", "dashboard"),
-            tagged_doc_id=tagged_doc_id
+            tagged_doc_id=tagged_doc_id,
+            top_k=15
         )
         
         # Check if RAG found a good answer
@@ -1908,19 +1912,24 @@ async def unified_chat_query(req: FrontendChatRequest):
         
         print(f"RAG Response: Confidence={rag_confidence}, Out of Scope={rag_out_of_scope}")
         
+        # Sanitize confidence to prevent JSON errors
+        import math
+        if math.isnan(rag_confidence) or math.isinf(rag_confidence):
+            rag_confidence = 0.0
+        
         # If RAG has HIGH confidence (>= 0.7), use it directly
         if rag_confidence >= 0.7 and not rag_out_of_scope:
             print(f"[RAG] Excellent answer found (confidence: {rag_confidence})")
             return {
                 "answer": rag_response.answer,
-                "confidence": rag_confidence,
+                "confidence": float(rag_confidence),
                 "sources": rag_response.citations if hasattr(rag_response, 'citations') else [],
                 "source_type": "rag",
                 "out_of_scope": False
             }
         
         # If RAG has MODERATE confidence (0.4-0.7), enhance with LLM
-        elif rag_confidence >= 0.4 and not rag_out_of_scope:
+        elif rag_confidence >= 0.4 and not rag_out_of_scope and not math.isnan(rag_confidence):
                 # Create enhanced prompt with special system message for enhancement
                 enhancement_system_prompt = """You are a helpful workplace assistant that expands and enriches information from company documents.
 

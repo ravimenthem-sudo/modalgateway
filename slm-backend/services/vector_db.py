@@ -76,7 +76,7 @@ class VectorDB:
 
         params = {
             "query_embedding": query_embeddings,
-            "match_threshold": 0.50,
+            "match_threshold": 0.10,
             "match_count": n_results,
             "filter": filters
         }
@@ -92,7 +92,8 @@ class VectorDB:
             matches = resp.json()
             logger.info(f"Supabase RPC returned {len(matches)} matches")
             for i, m in enumerate(matches):
-                logger.info(f"Match {i}: Similarity={m['similarity']:.4f}, Content={m['content'][:50]}...")
+                similarity = float(m['similarity']) if m.get('similarity') is not None else 0.0
+                logger.info(f"Match {i}: Similarity={similarity:.4f}, Content={m['content'][:50]}...")
             
             docs = []
             ids = []
